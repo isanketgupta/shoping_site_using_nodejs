@@ -6,13 +6,13 @@ const app = express();
 
 app.use(bodyParser.urlencoded({extended : false}));
 
-app.use(adminRoutes);
-app.use(shopRoutes);
+app.use('/admin',adminRoutes);
+app.use('/shop', shopRoutes);
 
 
 app.use('/home', (req, res, next) => {
     console.log('This is a home page!');
-    res.send('<h1>This is home page </h1>');
+    res.status(404).send('<h1>This is home page </h1>');
 });
 
 app.use((req, res, next) => {

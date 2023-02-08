@@ -1,19 +1,24 @@
-const express = require('express');
 const path = require('path');
-const rootDir = require('../util/path');
 
-const routes = express.Router();
+const express = require('express');
 
-routes.use('/add-product', (req, res, next) => {
-    console.log('This is product details page!!');
-    res.sendFile(path.join(rootDir , 'views', 'add-product.html'));
- //   res.send('<form name="title" method="post" action="/admin/add-product"> <input type="textbox" name="username"></input><button type="submit">submit</button></form>'); 
-});
+const adminController = require('../controllers/admin');
 
-routes.post('/add-product', (req, res, next) => {
-    console.log('This is product details page!');
-    console.log(req.body);
-    res.send('Product added!!')
-});
+const router = express.Router();
 
-module.exports = routes;
+// /admin/add-product => GET
+router.get('/add-product', adminController.getAddProduct);
+
+// /admin/products => GET
+router.get('/products', adminController.getProducts);
+
+// /admin/add-product => POST
+router.post('/add-product', adminController.postAddProduct);
+
+router.get('/edit-product/:productId', adminController.getEditProduct);
+
+router.post('/edit-product', adminController.postEditProduct);
+
+router.post('/delete-product', adminController.postDeleteProduct);
+
+module.exports = router;

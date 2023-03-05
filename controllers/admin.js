@@ -1,4 +1,6 @@
 const Product = require('../models/product');
+const mongodb = require('mongodb');
+
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -13,9 +15,11 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(null, title, imageUrl, description, price);
+  const userId = req.user._id;
+  console.log('postAddProduct uiserID'+userId)
+  const product = new Product(null, title, imageUrl, description, price, userId);
   product.save();
-  res.redirect('/');
+  res.redirect('products');
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -24,7 +28,7 @@ exports.getEditProduct = (req, res, next) => {
     return res.redirect('/');
   }
   const prodId = req.params.productId;
-  Product.findById(prodId, product => {
+  Product.findById(prodId).then(product => {
     if (!product) {
       return res.redirect('/');
     }
@@ -43,8 +47,9 @@ exports.postEditProduct = (req, res, next) => {
   const updatedPrice = req.body.price;
   const updatedImageUrl = req.body.imageUrl;
   const updatedDesc = req.body.description;
+  const ObjectId = mongodb.ObjectId
   const updatedProduct = new Product(
-    prodId,
+    new ObjectId(prodId),
     updatedTitle,
     updatedImageUrl,
     updatedDesc,
@@ -55,13 +60,17 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll(products => {
+  Product.fetchAll()
+  .then(products => {
     res.render('admin/products', {
       prods: products,
       pageTitle: 'Admin Products',
       path: '/admin/products'
     });
-  });
+  })
+  .catch( err=> {
+      console.log(err)
+    });
 };
 
 exports.postDeleteProduct = (req, res, next) => {

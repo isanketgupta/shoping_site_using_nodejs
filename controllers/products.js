@@ -3,12 +3,17 @@ const rootDir = require('../util/path');
 const Product = require('../models/products');
 
 exports.postAddProduct = (req, res, next) => {
-    console.log('Product Added');
-    // console.log(req.body);
-    const product = new Product(req.body.title);
-    product.save();
-    // console.log(Product.fetchall());
-    next();
+    const title = req.body.title;
+    const imageUrl = req.body.imageURL;
+    const price = req.body.price;
+    const description = req.body.description;
+    const userId = req.user._id
+    const product = new Product(null, title, imageUrl, description, price, userId);
+    product.save().then(
+        () => {
+            res.redirect('/');
+        }
+    ).catch(err => {console.log('error->'+err)});
 }
 
 exports.getAddProduct = (req, res, next) => {
@@ -25,17 +30,23 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.getAllProduct = (req, res, next) => {
     // console.log('assadk')
-    Product.fetchall( products => {
-        console.log('get all product');
-        res.render('shop', {
-            prods: products,
-            pageTitle: 'Shop',
-            path: '/shop/shoping',
-            hasProducts: products.length > 0,
-            activeShop: true,
-            productCSS: true
-        });
-    });
+    Product.fetchall().then(
+        products => {
+            console.log('get all product');
+            res.render('shop', {
+                prods: products,
+                pageTitle: 'Shop',
+                path: '/shop/shoping',
+                hasProducts: products.length > 0,
+                activeShop: true,
+                productCSS: true
+            });
+        }
+    ).catch(
+        err => {
+            console.log(err)
+        }
+    )
 }
 
 // exports.product = Product.fetchall();

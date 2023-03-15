@@ -1,5 +1,4 @@
-const path = require('path');
-const rootDir = require('../util/path');
+
 const Product = require('../models/products');
 
 exports.postAddProduct = (req, res, next) => {

@@ -1,35 +1,39 @@
-const User = require('../models/user')
+const User = require('../models/user');
 
 exports.getLogin = (req, res, next) => {
   res.render('auth/login', {
     path: '/login',
-    pageTitle: 'Login'
+    pageTitle: 'Login',
+    isAuthenticated: false
   });
 };
 
-
+exports.getSignup = (req, res, next) => {
+  res.render('auth/signup', {
+    path: '/signup',
+    pageTitle: 'Signup',
+    isAuthenticated: false
+  });
+};
 
 exports.postLogin = (req, res, next) => {
-  const email = req.body.email
-  const password = req.body.password
+  User.findById('5bab316ce0a7c75f783cb8a8')
+    .then(user => {
+      req.session.isLoggedIn = true;
+      req.session.user = user;
+      req.session.save(err => {
+        console.log(err);
+        res.redirect('/');
+      });
+    })
+    .catch(err => console.log(err));
+};
 
-  User
-  .findOne({ email : email })
-  .then( result => {
-        if (result){
-            console.log('login seccessful')
-            req.session.isAuthenticated = true;
-            req.session.user = result;
-            req.session.save( result => {
-              console.log('err'+result)
-              res.redirect('/')
-            })
-        }else{
-            console.log('login failed')
-            res.redirect('/login')
-        }
-  })
-  .catch( err => {
+exports.postSignup = (req, res, next) => {};
+
+exports.postLogout = (req, res, next) => {
+  req.session.destroy(err => {
     console.log(err);
-  })
+    res.redirect('/');
+  });
 };
